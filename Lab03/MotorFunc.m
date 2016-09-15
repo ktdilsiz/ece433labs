@@ -27,14 +27,31 @@ Kg = KgHigh;
 Ka = KaHigh;
 Kb = KbHigh;
 
+Vm = 1:0.01:10;
+
 %%end of section
 
 %%
 
 s = tf('s');
 
-G1 = 1/((s^2)/Ka + s*(Beq/(Jeq*Ka) + Rm/Ka) + Rm*Beq/(Jeq*Ka));
+G1 = 1/((s^2)/Ka + s*(Beq/(Jeq*Ka) + Rm/Ka) + Rm*Beq/(Jeq*Ka) + Kb);
 
 G2 = 1/(s*Lm + Rm - Kb/(Beq/(Jeq*Ka) + s/Ka));
+
+IoverW = Beq/(Jeq*Ka) + s/Ka;
+
+G2alt = G1 * IoverW;
+
+%%end of section
+
+%%
+
+G1result = Jeq*Ka/(Rm*Beq + Jeq*Ka*Kb)
+IoverWresult = (Beq/(Jeq*Ka));
+
+G2result = Jeq*Ka/(Rm*Jeq*Ka - Kb);
+
+G2altresult = G1result * IoverWresult
 
 %%end of section
