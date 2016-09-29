@@ -1,5 +1,5 @@
-%%lab4 controls
-
+% %%lab4 controls
+% 
 Rm = 2.6;
 Lm = 0.18e-3;
 
@@ -33,12 +33,12 @@ Ka = KaHigh;
 Kb = KbHigh;
 
 Vm = 1:0.01:10;
-
-%%end of section
+% 
+% %%end of section
 
 %%
 
-s = tf('s');
+% s = tf('s');
 
 % G1 = 1/((s^2)/Ka + s*(Beq/(Jeq*Ka) + Rm/Ka) + Rm*Beq/(Jeq*Ka) + Kb);
 % 
@@ -64,38 +64,46 @@ s = tf('s');
 %%
 %Least Squares Estimation
 
-load ThetaSim
-load VSim
-load Wsim
+load DataSim
 t = data(1,:)';
-Vm = Vdata(2,:)';
-W_tach = Wdata(2,:)';
-theta = Tdata(2,:)';
+Vm = data(2,:)';
+W_tach = data(3,:)';
+theta = data(4,:)';
 
-% fs = 0.001;
-% fc = 
-% fcm = fc/(fs/2);
-% [b,a] = butter(3, fcm);
-% 
-% dtheta = diff(theta);
-% wf = filter(b,a,dtheta);
-% wff= filtfilt(b,a,dtheta);
-% 
-% dwf1 = diff(W_tach);
-% dwf2 = filter(W_tach);
-% 
-% dwff1 = diff(dw1);
-% dwff2 = filtfilt(W_tach);
-% 
-% W = [
-% Y = [
-% Rw = W.'*W;
-% Rwy = Rw\W.'*Y;
-% Ei = (Y.*'Y) - Y.')*(Rw\(W.'*Y));
+fs = 1000;
+k = 36;
+    fcm = k / (fs/2);
+    
+    [b,a] = butter(3, fcm);
+    
+    omega = diff(theta)*fs;
+    
+    wf = filter(b,a,omega);
+    wff = filtfilt(b,a,omega);
+    
+    dwf = filter(b,a,diff(wf)*fs);
+    dwff = filtfilt(b,a,diff(wff)*fs);
+    
+    index = 21:length(t)-20;
+    W = [dwff(index) wff(index)];
+    Y = Vm(index);
+    
+    Rw = W'*W;
+    Rwy = W'*Y;
+    RwInv = inv(Rw);
 
-
-
-
+    Ry = Y'*Y;
+    Ryw = Y'*W;
+    
+    K = RwInv*Rwy;
+    
+    Ei = sqrt((Ry - Ryw*RwInv*Rwy)/Ry);
+    
+    alpha = 1/K(1);
+    tau = K(2)*alpha;
+     
+%[Eimin, I] = min(Ei)
+%plot(fc,Ei);
 
 
 
