@@ -7,9 +7,9 @@
  *
  * Code generation for model "MotorSimlab4".
  *
- * Model version              : 1.5
+ * Model version              : 1.6
  * Simulink Coder version : 8.9 (R2015b) 13-Aug-2015
- * C source code generated on : Wed Sep 28 12:42:48 2016
+ * C source code generated on : Thu Sep 29 13:53:24 2016
  *
  * Target selection: quarc_win64.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -1162,15 +1162,15 @@ RT_MODEL_MotorSimlab4_T *MotorSimlab4(void)
     MotorSimlab4_M->Timing.sampleHits = (&mdlSampleHits[0]);
   }
 
-  rtmSetTFinal(MotorSimlab4_M, 10.0);
+  rtmSetTFinal(MotorSimlab4_M, 6000.0);
   MotorSimlab4_M->Timing.stepSize0 = 0.001;
   MotorSimlab4_M->Timing.stepSize1 = 0.001;
 
   /* External mode info */
-  MotorSimlab4_M->Sizes.checksums[0] = (2992229853U);
-  MotorSimlab4_M->Sizes.checksums[1] = (2786294000U);
-  MotorSimlab4_M->Sizes.checksums[2] = (2681191631U);
-  MotorSimlab4_M->Sizes.checksums[3] = (3297192121U);
+  MotorSimlab4_M->Sizes.checksums[0] = (3923191368U);
+  MotorSimlab4_M->Sizes.checksums[1] = (2303068652U);
+  MotorSimlab4_M->Sizes.checksums[2] = (2280971573U);
+  MotorSimlab4_M->Sizes.checksums[3] = (922087767U);
 
   {
     static const sysRanDType rtAlwaysEnabled = SUBSYS_RAN_BC_ENABLE;

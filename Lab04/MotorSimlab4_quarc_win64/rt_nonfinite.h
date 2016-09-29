@@ -7,9 +7,9 @@
  *
  * Code generation for model "MotorSimlab4".
  *
- * Model version              : 1.5
+ * Model version              : 1.6
  * Simulink Coder version : 8.9 (R2015b) 13-Aug-2015
- * C source code generated on : Wed Sep 28 12:42:48 2016
+ * C source code generated on : Thu Sep 29 13:53:24 2016
  *
  * Target selection: quarc_win64.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
