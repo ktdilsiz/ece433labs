@@ -64,7 +64,7 @@ Vm = 1:0.01:10;
 %%
 %Least Squares Estimation
 
-load DataSim
+load DataSim1
 t = data(1,:)';
 Vm = data(2,:)';
 W_tach = data(3,:)';
