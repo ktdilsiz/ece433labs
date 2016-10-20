@@ -9,7 +9,7 @@
  *
  * Model version              : 1.0
  * Simulink Coder version : 8.9 (R2015b) 13-Aug-2015
- * C source code generated on : Wed Oct 19 18:52:32 2016
+ * C source code generated on : Wed Oct 19 22:38:51 2016
  *
  * Target selection: quarc_win64.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -62,16 +62,16 @@ static const char_T * rtDataTypeNames[] = {
 
 /* data type transitions for block I/O structure */
 static DataTypeTransition rtBTransitions[] = {
-  { (char_T *)(&untitled_B.Tacometer1), 0, 0, 9 }
+  { (char_T *)(&untitled_B.Encoder1), 0, 0, 8 }
   ,
 
-  { (char_T *)(&untitled_DW.HILInitialize_AIMinimums[0]), 0, 0, 70 },
+  { (char_T *)(&untitled_DW.HILInitialize_AIMinimums[0]), 0, 0, 74 },
 
   { (char_T *)(&untitled_DW.HILReadAnalogTimebase1_Task), 14, 0, 1 },
 
   { (char_T *)(&untitled_DW.HILInitialize_Card), 15, 0, 1 },
 
-  { (char_T *)(&untitled_DW.HILWriteAnalog_PWORK), 11, 0, 5 },
+  { (char_T *)(&untitled_DW.HILReadEncoder1_PWORK), 11, 0, 6 },
 
   { (char_T *)(&untitled_DW.HILInitialize_ClockModes[0]), 6, 0, 44 },
 
@@ -86,7 +86,7 @@ static DataTypeTransitionTable rtBTransTable = {
 
 /* data type transitions for Parameters structure */
 static DataTypeTransition rtPTransitions[] = {
-  { (char_T *)(&untitled_P.K1), 0, 0, 24 },
+  { (char_T *)(&untitled_P.K1), 0, 0, 26 },
 
   { (char_T *)(&untitled_P.HILReadAnalogTimebase1_clock), 6, 0, 10 },
 
@@ -94,7 +94,7 @@ static DataTypeTransition rtPTransitions[] = {
 
   { (char_T *)(&untitled_P.HILInitialize_active), 8, 0, 35 },
 
-  { (char_T *)(&untitled_P.Motor1_IC), 0, 0, 14 },
+  { (char_T *)(&untitled_P.Motor1_IC), 0, 0, 20 },
 
   { (char_T *)(&untitled_P.HILReadAnalogTimebase1_Active), 8, 0, 3 }
 };

@@ -9,7 +9,7 @@
  *
  * Model version              : 1.0
  * Simulink Coder version : 8.9 (R2015b) 13-Aug-2015
- * C source code generated on : Wed Oct 19 18:52:32 2016
+ * C source code generated on : Wed Oct 19 22:38:51 2016
  *
  * Target selection: quarc_win64.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -34,6 +34,60 @@ DW_untitled_T untitled_DW;
 /* Real-time model */
 RT_MODEL_untitled_T untitled_M_;
 RT_MODEL_untitled_T *const untitled_M = &untitled_M_;
+real_T look1_binlxpw(real_T u0, const real_T bp0[], const real_T table[],
+                     uint32_T maxIndex)
+{
+  real_T frac;
+  uint32_T iRght;
+  uint32_T iLeft;
+  uint32_T bpIdx;
+
+  /* Lookup 1-D
+     Search method: 'binary'
+     Use previous index: 'off'
+     Interpolation method: 'Linear'
+     Extrapolation method: 'Linear'
+     Use last breakpoint for index at or above upper limit: 'off'
+     Remove protection against out-of-range input in generated code: 'off'
+   */
+  /* Prelookup - Index and Fraction
+     Index Search method: 'binary'
+     Extrapolation method: 'Linear'
+     Use previous index: 'off'
+     Use last breakpoint for index at or above upper limit: 'off'
+     Remove protection against out-of-range input in generated code: 'off'
+   */
+  if (u0 <= bp0[0U]) {
+    iLeft = 0U;
+    frac = (u0 - bp0[0U]) / (bp0[1U] - bp0[0U]);
+  } else if (u0 < bp0[maxIndex]) {
+    /* Binary Search */
+    bpIdx = maxIndex >> 1U;
+    iLeft = 0U;
+    iRght = maxIndex;
+    while (iRght - iLeft > 1U) {
+      if (u0 < bp0[bpIdx]) {
+        iRght = bpIdx;
+      } else {
+        iLeft = bpIdx;
+      }
+
+      bpIdx = (iRght + iLeft) >> 1U;
+    }
+
+    frac = (u0 - bp0[iLeft]) / (bp0[iLeft + 1U] - bp0[iLeft]);
+  } else {
+    iLeft = maxIndex - 1U;
+    frac = (u0 - bp0[maxIndex - 1U]) / (bp0[maxIndex] - bp0[maxIndex - 1U]);
+  }
+
+  /* Interpolation 1-D
+     Interpolation method: 'Linear'
+     Use last breakpoint for index at or above upper limit: 'off'
+     Overflow mode: 'portable wrapping'
+   */
+  return (table[iLeft + 1U] - table[iLeft]) * frac + table[iLeft];
+}
 
 /*
  * This function updates continuous states using the ODE4 fixed-step
@@ -105,15 +159,64 @@ static void rt_ertODEUpdateContinuousStates(RTWSolverInfo *si )
   rtsiSetSimTimeStep(si,MAJOR_TIME_STEP);
 }
 
+real_T rt_roundd_snf(real_T u)
+{
+  real_T y;
+  if (fabs(u) < 4.503599627370496E+15) {
+    if (u >= 0.5) {
+      y = floor(u + 0.5);
+    } else if (u > -0.5) {
+      y = u * 0.0;
+    } else {
+      y = ceil(u - 0.5);
+    }
+  } else {
+    y = u;
+  }
+
+  return y;
+}
+
+real_T rt_remd_snf(real_T u0, real_T u1)
+{
+  real_T y;
+  real_T u1_0;
+  if (!((!rtIsNaN(u0)) && (!rtIsInf(u0)) && ((!rtIsNaN(u1)) && (!rtIsInf(u1)))))
+  {
+    y = (rtNaN);
+  } else {
+    if (u1 < 0.0) {
+      u1_0 = ceil(u1);
+    } else {
+      u1_0 = floor(u1);
+    }
+
+    if ((u1 != 0.0) && (u1 != u1_0)) {
+      u1_0 = u0 / u1;
+      if (fabs(u1_0 - rt_roundd_snf(u1_0)) <= DBL_EPSILON * fabs(u1_0)) {
+        y = 0.0;
+      } else {
+        y = fmod(u0, u1);
+      }
+    } else {
+      y = fmod(u0, u1);
+    }
+  }
+
+  return y;
+}
+
 /* Model output function */
 void untitled_output(void)
 {
   /* local block i/o variables */
-  real_T rtb_Add1;
+  real_T rtb_Gain8;
   real_T rtb_HILReadAnalogTimebase1_o1;
+  real_T rtb_HILReadAnalogTimebase1_o2;
   real_T rtb_HILReadEncoder1;
-  real_T currentTime;
   real_T *lastU;
+  real_T rtb_Gain7;
+  real_T rtb_Add1;
   if (rtmIsMajorTimeStep(untitled_M)) {
     /* set solver stop time */
     if (!(untitled_M->Timing.clockTick0+1)) {
@@ -149,65 +252,105 @@ void untitled_output(void)
 
       rtb_HILReadAnalogTimebase1_o1 = untitled_DW.HILReadAnalogTimebase1_Buffer
         [0];
-      rtb_HILReadEncoder1 = untitled_DW.HILReadAnalogTimebase1_Buffer[1];
+      rtb_HILReadAnalogTimebase1_o2 = untitled_DW.HILReadAnalogTimebase1_Buffer
+        [1];
     }
   }
 
-  /* Step: '<S1>/Step' */
-  currentTime = untitled_M->Timing.t[0];
+  /* Integrator: '<Root>/Motor1' */
+  rtb_Gain8 = untitled_X.Motor1_CSTATE;
 
-  /* Clock: '<S1>/Clock' */
-  rtb_Add1 = untitled_M->Timing.t[0];
+  /* Gain: '<Root>/Gain7' */
+  rtb_Gain7 = untitled_P.K1 * rtb_Gain8;
 
-  /* Step: '<S1>/Step' */
-  if (currentTime < untitled_P.Ramp_start) {
-    currentTime = untitled_P.Step_Y0;
-  } else {
-    currentTime = untitled_P.Ramp_slope;
-  }
+  /* Clock: '<S2>/Clock' */
+  rtb_Gain8 = untitled_M->Timing.t[0];
 
-  /* Sum: '<S1>/Output' incorporates:
-   *  Constant: '<S1>/Constant'
-   *  Constant: '<S1>/Constant1'
-   *  Product: '<S1>/Product'
-   *  Sum: '<S1>/Sum'
+  /* Sum: '<S2>/Sum' incorporates:
+   *  S-Function (sfun_tstart): '<S2>/startTime'
    */
-  rtb_Add1 = (rtb_Add1 - untitled_P.Ramp_start) * currentTime +
-    untitled_P.Ramp_X0;
+  rtb_Gain8 -= (0.0);
+
+  /* Math: '<S2>/Math Function' incorporates:
+   *  Constant: '<S2>/Constant'
+   */
+  rtb_Gain8 = rt_remd_snf(rtb_Gain8, untitled_P.Constant_Value);
+
+  /* Lookup_n-D: '<S2>/Look-Up Table1' */
+  rtb_Gain8 = look1_binlxpw(rtb_Gain8, untitled_P.LookUpTable1_bp01Data,
+    untitled_P.RepeatingSequence_rep_seq_y, 4U);
+
+  /* Gain: '<Root>/Gain8' */
+  rtb_Gain8 *= untitled_P.Gain8_Gain;
   if (rtmIsMajorTimeStep(untitled_M)) {
-    /* Gain: '<Root>/Tacometer1' */
-    untitled_B.Tacometer1 = -69.813170079773172 / untitled_P.Kg *
-      rtb_HILReadEncoder1;
+    /* S-Function (hil_read_encoder_block): '<Root>/HIL Read Encoder1' */
+
+    /* S-Function Block: untitled/HIL Read Encoder1 (hil_read_encoder_block) */
+    {
+      t_error result = hil_read_encoder(untitled_DW.HILInitialize_Card,
+        &untitled_P.HILReadEncoder1_channels, 1,
+        &untitled_DW.HILReadEncoder1_Buffer);
+      if (result < 0) {
+        msg_get_error_messageA(NULL, result, _rt_error_message, sizeof
+          (_rt_error_message));
+        rtmSetErrorStatus(untitled_M, _rt_error_message);
+      } else {
+        rtb_HILReadEncoder1 = untitled_DW.HILReadEncoder1_Buffer;
+      }
+    }
+
+    /* Gain: '<Root>/Encoder1' */
+    untitled_B.Encoder1 = untitled_P.Encoder1_Gain * rtb_HILReadEncoder1;
   }
 
   /* Sum: '<Root>/Add4' */
-  untitled_B.Add4 = rtb_Add1 - untitled_B.Tacometer1;
-  if (rtmIsMajorTimeStep(untitled_M)) {
-    /* Gain: '<Root>/Gain6' */
-    untitled_B.Gain6 = untitled_P.Kd * untitled_B.Tacometer1;
+  untitled_B.Add4 = rtb_Gain8 - untitled_B.Encoder1;
+
+  /* Derivative: '<Root>/Derivative1' */
+  if ((untitled_DW.TimeStampA >= untitled_M->Timing.t[0]) &&
+      (untitled_DW.TimeStampB >= untitled_M->Timing.t[0])) {
+    rtb_Add1 = 0.0;
+  } else {
+    rtb_Add1 = untitled_DW.TimeStampA;
+    lastU = &untitled_DW.LastUAtTimeA;
+    if (untitled_DW.TimeStampA < untitled_DW.TimeStampB) {
+      if (untitled_DW.TimeStampB < untitled_M->Timing.t[0]) {
+        rtb_Add1 = untitled_DW.TimeStampB;
+        lastU = &untitled_DW.LastUAtTimeB;
+      }
+    } else {
+      if (untitled_DW.TimeStampA >= untitled_M->Timing.t[0]) {
+        rtb_Add1 = untitled_DW.TimeStampB;
+        lastU = &untitled_DW.LastUAtTimeB;
+      }
+    }
+
+    rtb_Add1 = (untitled_B.Encoder1 - *lastU) / (untitled_M->Timing.t[0] -
+      rtb_Add1);
   }
+
+  /* End of Derivative: '<Root>/Derivative1' */
 
   /* Sum: '<Root>/Add3' incorporates:
    *  Gain: '<Root>/Gain5'
-   *  Gain: '<Root>/Gain7'
-   *  Integrator: '<Root>/Motor1'
+   *  Gain: '<Root>/Gain6'
    */
-  currentTime = (untitled_P.K1 * untitled_X.Motor1_CSTATE + untitled_P.Kp *
-                 untitled_B.Add4) - untitled_B.Gain6;
+  rtb_Add1 = (untitled_P.Kp * untitled_B.Add4 + rtb_Gain7) - untitled_P.Kd *
+    rtb_Add1;
 
   /* Saturate: '<Root>/Saturation1' */
-  if (currentTime > untitled_P.Saturation1_UpperSat) {
-    currentTime = untitled_P.Saturation1_UpperSat;
+  if (rtb_Add1 > untitled_P.Saturation1_UpperSat) {
+    rtb_Add1 = untitled_P.Saturation1_UpperSat;
   } else {
-    if (currentTime < untitled_P.Saturation1_LowerSat) {
-      currentTime = untitled_P.Saturation1_LowerSat;
+    if (rtb_Add1 < untitled_P.Saturation1_LowerSat) {
+      rtb_Add1 = untitled_P.Saturation1_LowerSat;
     }
   }
 
   /* Gain: '<Root>/Gain3' incorporates:
    *  Saturate: '<Root>/Saturation1'
    */
-  untitled_B.Gain3 = untitled_P.Gain3_Gain * currentTime;
+  untitled_B.Gain3 = untitled_P.Gain3_Gain * rtb_Add1;
   if (rtmIsMajorTimeStep(untitled_M)) {
     /* S-Function (hil_write_analog_block): '<Root>/HIL Write Analog' */
 
@@ -231,54 +374,32 @@ void untitled_output(void)
   untitled_B.TransferFcn += untitled_P.TransferFcn_C[1] *
     untitled_X.TransferFcn_CSTATE[1];
   if (rtmIsMajorTimeStep(untitled_M)) {
-    /* Gain: '<Root>/Potentiometer1' */
-    untitled_B.Potentiometer1 = untitled_P.Potentiometer1_Gain *
-      rtb_HILReadAnalogTimebase1_o1;
-
-    /* S-Function (hil_read_encoder_block): '<Root>/HIL Read Encoder1' */
-
-    /* S-Function Block: untitled/HIL Read Encoder1 (hil_read_encoder_block) */
-    {
-      t_error result = hil_read_encoder(untitled_DW.HILInitialize_Card,
-        &untitled_P.HILReadEncoder1_channels, 1,
-        &untitled_DW.HILReadEncoder1_Buffer);
-      if (result < 0) {
-        msg_get_error_messageA(NULL, result, _rt_error_message, sizeof
-          (_rt_error_message));
-        rtmSetErrorStatus(untitled_M, _rt_error_message);
-      } else {
-        rtb_HILReadEncoder1 = untitled_DW.HILReadEncoder1_Buffer;
-      }
-    }
-
-    /* Gain: '<Root>/Encoder1' */
-    untitled_B.Encoder1 = untitled_P.Encoder1_Gain * rtb_HILReadEncoder1;
   }
 
   /* Sum: '<Root>/Add2' */
-  untitled_B.Add2 = rtb_Add1 - untitled_B.TransferFcn;
+  untitled_B.Add2 = rtb_Gain8 - untitled_B.TransferFcn;
 
   /* Derivative: '<Root>/Derivative' */
-  if ((untitled_DW.TimeStampA >= untitled_M->Timing.t[0]) &&
-      (untitled_DW.TimeStampB >= untitled_M->Timing.t[0])) {
+  if ((untitled_DW.TimeStampA_i >= untitled_M->Timing.t[0]) &&
+      (untitled_DW.TimeStampB_a >= untitled_M->Timing.t[0])) {
     rtb_Add1 = 0.0;
   } else {
-    currentTime = untitled_DW.TimeStampA;
-    lastU = &untitled_DW.LastUAtTimeA;
-    if (untitled_DW.TimeStampA < untitled_DW.TimeStampB) {
-      if (untitled_DW.TimeStampB < untitled_M->Timing.t[0]) {
-        currentTime = untitled_DW.TimeStampB;
-        lastU = &untitled_DW.LastUAtTimeB;
+    rtb_Add1 = untitled_DW.TimeStampA_i;
+    lastU = &untitled_DW.LastUAtTimeA_f;
+    if (untitled_DW.TimeStampA_i < untitled_DW.TimeStampB_a) {
+      if (untitled_DW.TimeStampB_a < untitled_M->Timing.t[0]) {
+        rtb_Add1 = untitled_DW.TimeStampB_a;
+        lastU = &untitled_DW.LastUAtTimeB_d;
       }
     } else {
-      if (untitled_DW.TimeStampA >= untitled_M->Timing.t[0]) {
-        currentTime = untitled_DW.TimeStampB;
-        lastU = &untitled_DW.LastUAtTimeB;
+      if (untitled_DW.TimeStampA_i >= untitled_M->Timing.t[0]) {
+        rtb_Add1 = untitled_DW.TimeStampB_a;
+        lastU = &untitled_DW.LastUAtTimeB_d;
       }
     }
 
     rtb_Add1 = (untitled_B.TransferFcn - *lastU) / (untitled_M->Timing.t[0] -
-      currentTime);
+      rtb_Add1);
   }
 
   /* End of Derivative: '<Root>/Derivative' */
@@ -289,19 +410,28 @@ void untitled_output(void)
    *  Gain: '<Root>/Gain4'
    *  Integrator: '<Root>/Motor'
    */
-  rtb_Add1 = (untitled_P.K1 * untitled_X.Motor_CSTATE + untitled_P.Kp *
-              untitled_B.Add2) - untitled_P.Kd * rtb_Add1;
+  rtb_Gain7 = (untitled_P.K1 * untitled_X.Motor_CSTATE + untitled_P.Kp *
+               untitled_B.Add2) - untitled_P.Kd * rtb_Add1;
 
   /* Saturate: '<Root>/Saturation2' */
-  if (rtb_Add1 > untitled_P.Saturation2_UpperSat) {
+  if (rtb_Gain7 > untitled_P.Saturation2_UpperSat) {
     untitled_B.Saturation2 = untitled_P.Saturation2_UpperSat;
-  } else if (rtb_Add1 < untitled_P.Saturation2_LowerSat) {
+  } else if (rtb_Gain7 < untitled_P.Saturation2_LowerSat) {
     untitled_B.Saturation2 = untitled_P.Saturation2_LowerSat;
   } else {
-    untitled_B.Saturation2 = rtb_Add1;
+    untitled_B.Saturation2 = rtb_Gain7;
   }
 
   /* End of Saturate: '<Root>/Saturation2' */
+  if (rtmIsMajorTimeStep(untitled_M)) {
+    /* Gain: '<Root>/Potentiometer1' */
+    untitled_B.Potentiometer1 = untitled_P.Potentiometer1_Gain *
+      rtb_HILReadAnalogTimebase1_o1;
+
+    /* Gain: '<Root>/Tacometer1' */
+    untitled_B.Tacometer1 = -69.813170079773172 / untitled_P.Kg *
+      rtb_HILReadAnalogTimebase1_o2;
+  }
 }
 
 /* Model update function */
@@ -309,7 +439,7 @@ void untitled_update(void)
 {
   real_T *lastU;
 
-  /* Update for Derivative: '<Root>/Derivative' */
+  /* Update for Derivative: '<Root>/Derivative1' */
   if (untitled_DW.TimeStampA == (rtInf)) {
     untitled_DW.TimeStampA = untitled_M->Timing.t[0];
     lastU = &untitled_DW.LastUAtTimeA;
@@ -322,6 +452,25 @@ void untitled_update(void)
   } else {
     untitled_DW.TimeStampB = untitled_M->Timing.t[0];
     lastU = &untitled_DW.LastUAtTimeB;
+  }
+
+  *lastU = untitled_B.Encoder1;
+
+  /* End of Update for Derivative: '<Root>/Derivative1' */
+
+  /* Update for Derivative: '<Root>/Derivative' */
+  if (untitled_DW.TimeStampA_i == (rtInf)) {
+    untitled_DW.TimeStampA_i = untitled_M->Timing.t[0];
+    lastU = &untitled_DW.LastUAtTimeA_f;
+  } else if (untitled_DW.TimeStampB_a == (rtInf)) {
+    untitled_DW.TimeStampB_a = untitled_M->Timing.t[0];
+    lastU = &untitled_DW.LastUAtTimeB_d;
+  } else if (untitled_DW.TimeStampA_i < untitled_DW.TimeStampB_a) {
+    untitled_DW.TimeStampA_i = untitled_M->Timing.t[0];
+    lastU = &untitled_DW.LastUAtTimeA_f;
+  } else {
+    untitled_DW.TimeStampB_a = untitled_M->Timing.t[0];
+    lastU = &untitled_DW.LastUAtTimeB_d;
   }
 
   *lastU = untitled_B.TransferFcn;
@@ -347,7 +496,7 @@ void untitled_update(void)
   untitled_M->Timing.t[0] = rtsiGetSolverStopTime(&untitled_M->solverInfo);
 
   {
-    /* Update absolute timer for sample time: [0.002s, 0.0s] */
+    /* Update absolute timer for sample time: [0.001s, 0.0s] */
     /* The "clockTick1" counts the number of times the code of this task has
      * been executed. The absolute time is the multiplication of "clockTick1"
      * and "Timing.stepSize1". Size of "clockTick1" ensures timer will not
@@ -425,7 +574,7 @@ void untitled_initialize(void)
     }
 
     if ((untitled_P.HILInitialize_set_analog_input_ && !is_switching) ||
-        (untitled_P.HILInitialize_set_analog_inpu_b && is_switching)) {
+        (untitled_P.HILInitialize_set_analog_inpu_c && is_switching)) {
       {
         int_T i1;
         real_T *dw_AIMinimums = &untitled_DW.HILInitialize_AIMinimums[0];
@@ -455,7 +604,7 @@ void untitled_initialize(void)
     }
 
     if ((untitled_P.HILInitialize_set_analog_output && !is_switching) ||
-        (untitled_P.HILInitialize_set_analog_outp_f && is_switching)) {
+        (untitled_P.HILInitialize_set_analog_outp_i && is_switching)) {
       {
         int_T i1;
         real_T *dw_AOMinimums = &untitled_DW.HILInitialize_AOMinimums[0];
@@ -485,7 +634,7 @@ void untitled_initialize(void)
     }
 
     if ((untitled_P.HILInitialize_set_analog_outp_g && !is_switching) ||
-        (untitled_P.HILInitialize_set_analog_outp_h && is_switching)) {
+        (untitled_P.HILInitialize_set_analog_outp_o && is_switching)) {
       {
         int_T i1;
         real_T *dw_AOVoltages = &untitled_DW.HILInitialize_AOVoltages[0];
@@ -505,7 +654,7 @@ void untitled_initialize(void)
       }
     }
 
-    if (untitled_P.HILInitialize_set_analog_outp_p) {
+    if (untitled_P.HILInitialize_set_analog_outp_d) {
       {
         int_T i1;
         real_T *dw_AOVoltages = &untitled_DW.HILInitialize_AOVoltages[0];
@@ -527,7 +676,7 @@ void untitled_initialize(void)
     }
 
     if ((untitled_P.HILInitialize_set_encoder_param && !is_switching) ||
-        (untitled_P.HILInitialize_set_encoder_par_j && is_switching)) {
+        (untitled_P.HILInitialize_set_encoder_par_c && is_switching)) {
       {
         int_T i1;
         int32_T *dw_QuadratureModes =
@@ -550,7 +699,7 @@ void untitled_initialize(void)
     }
 
     if ((untitled_P.HILInitialize_set_encoder_count && !is_switching) ||
-        (untitled_P.HILInitialize_set_encoder_cou_l && is_switching)) {
+        (untitled_P.HILInitialize_set_encoder_cou_d && is_switching)) {
       {
         int_T i1;
         int32_T *dw_InitialEICounts =
@@ -572,7 +721,7 @@ void untitled_initialize(void)
     }
 
     if ((untitled_P.HILInitialize_set_pwm_params_at && !is_switching) ||
-        (untitled_P.HILInitialize_set_pwm_params__f && is_switching)) {
+        (untitled_P.HILInitialize_set_pwm_params__c && is_switching)) {
       uint32_T num_duty_cycle_modes = 0;
       uint32_T num_frequency_modes = 0;
 
@@ -707,7 +856,7 @@ void untitled_initialize(void)
     }
 
     if ((untitled_P.HILInitialize_set_pwm_outputs_a && !is_switching) ||
-        (untitled_P.HILInitialize_set_pwm_outputs_l && is_switching)) {
+        (untitled_P.HILInitialize_set_pwm_outputs_h && is_switching)) {
       {
         int_T i1;
         real_T *dw_POValues = &untitled_DW.HILInitialize_POValues[0];
@@ -767,6 +916,10 @@ void untitled_initialize(void)
   /* InitializeConditions for Integrator: '<Root>/Motor1' */
   untitled_X.Motor1_CSTATE = untitled_P.Motor1_IC;
 
+  /* InitializeConditions for Derivative: '<Root>/Derivative1' */
+  untitled_DW.TimeStampA = (rtInf);
+  untitled_DW.TimeStampB = (rtInf);
+
   /* InitializeConditions for TransferFcn: '<Root>/Transfer Fcn' */
   untitled_X.TransferFcn_CSTATE[0] = 0.0;
   untitled_X.TransferFcn_CSTATE[1] = 0.0;
@@ -775,8 +928,8 @@ void untitled_initialize(void)
   untitled_X.Motor_CSTATE = untitled_P.Motor_IC;
 
   /* InitializeConditions for Derivative: '<Root>/Derivative' */
-  untitled_DW.TimeStampA = (rtInf);
-  untitled_DW.TimeStampB = (rtInf);
+  untitled_DW.TimeStampA_i = (rtInf);
+  untitled_DW.TimeStampB_a = (rtInf);
 }
 
 /* Model terminate function */
@@ -793,8 +946,8 @@ void untitled_terminate(void)
     hil_task_stop_all(untitled_DW.HILInitialize_Card);
     hil_monitor_stop_all(untitled_DW.HILInitialize_Card);
     is_switching = false;
-    if ((untitled_P.HILInitialize_set_analog_outp_a && !is_switching) ||
-        (untitled_P.HILInitialize_set_analog_outp_b && is_switching)) {
+    if ((untitled_P.HILInitialize_set_analog_outp_l && !is_switching) ||
+        (untitled_P.HILInitialize_set_analog_outp_a && is_switching)) {
       {
         int_T i1;
         real_T *dw_AOVoltages = &untitled_DW.HILInitialize_AOVoltages[0];
@@ -806,8 +959,8 @@ void untitled_terminate(void)
       num_final_analog_outputs = 8U;
     }
 
-    if ((untitled_P.HILInitialize_set_pwm_outputs_p && !is_switching) ||
-        (untitled_P.HILInitialize_set_pwm_output_ab && is_switching)) {
+    if ((untitled_P.HILInitialize_set_pwm_outputs_c && !is_switching) ||
+        (untitled_P.HILInitialize_set_pwm_outputs_m && is_switching)) {
       {
         int_T i1;
         real_T *dw_POValues = &untitled_DW.HILInitialize_POValues[0];
@@ -991,7 +1144,7 @@ RT_MODEL_untitled_T *untitled(void)
 
     /* task periods */
     untitled_M->Timing.sampleTimes[0] = (0.0);
-    untitled_M->Timing.sampleTimes[1] = (0.002);
+    untitled_M->Timing.sampleTimes[1] = (0.001);
 
     /* task offsets */
     untitled_M->Timing.offsetTimes[0] = (0.0);
@@ -1007,15 +1160,15 @@ RT_MODEL_untitled_T *untitled(void)
     untitled_M->Timing.sampleHits = (&mdlSampleHits[0]);
   }
 
-  rtmSetTFinal(untitled_M, 7.0);
-  untitled_M->Timing.stepSize0 = 0.002;
-  untitled_M->Timing.stepSize1 = 0.002;
+  rtmSetTFinal(untitled_M, 40.0);
+  untitled_M->Timing.stepSize0 = 0.001;
+  untitled_M->Timing.stepSize1 = 0.001;
 
   /* External mode info */
-  untitled_M->Sizes.checksums[0] = (4152270820U);
-  untitled_M->Sizes.checksums[1] = (2319784545U);
-  untitled_M->Sizes.checksums[2] = (2832170499U);
-  untitled_M->Sizes.checksums[3] = (674991993U);
+  untitled_M->Sizes.checksums[0] = (2878326500U);
+  untitled_M->Sizes.checksums[1] = (487328682U);
+  untitled_M->Sizes.checksums[2] = (782736780U);
+  untitled_M->Sizes.checksums[3] = (2462328483U);
 
   {
     static const sysRanDType rtAlwaysEnabled = SUBSYS_RAN_BC_ENABLE;
@@ -1031,8 +1184,8 @@ RT_MODEL_untitled_T *untitled(void)
   }
 
   untitled_M->solverInfoPtr = (&untitled_M->solverInfo);
-  untitled_M->Timing.stepSize = (0.002);
-  rtsiSetFixedStepSize(&untitled_M->solverInfo, 0.002);
+  untitled_M->Timing.stepSize = (0.001);
+  rtsiSetFixedStepSize(&untitled_M->solverInfo, 0.001);
   rtsiSetSolverMode(&untitled_M->solverInfo, SOLVER_MODE_SINGLETASKING);
 
   /* block I/O */
@@ -1080,9 +1233,9 @@ RT_MODEL_untitled_T *untitled(void)
   untitled_M->Sizes.numU = (0);        /* Number of model inputs */
   untitled_M->Sizes.sysDirFeedThru = (0);/* The model is not direct feedthrough */
   untitled_M->Sizes.numSampTimes = (2);/* Number of sample times */
-  untitled_M->Sizes.numBlocks = (32);  /* Number of blocks */
-  untitled_M->Sizes.numBlockIO = (9);  /* Number of block outputs */
-  untitled_M->Sizes.numBlockPrms = (124);/* Sum of parameter "widths" */
+  untitled_M->Sizes.numBlocks = (34);  /* Number of blocks */
+  untitled_M->Sizes.numBlockIO = (8);  /* Number of block outputs */
+  untitled_M->Sizes.numBlockPrms = (132);/* Sum of parameter "widths" */
   return untitled_M;
 }
 

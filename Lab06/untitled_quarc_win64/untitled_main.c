@@ -4,7 +4,7 @@
  * This file was generated automatically by QUARC. It serves as the main
  * entry point for the real-time code.
  *
- * Date:           Wed Oct 19 18:52:32 2016
+ * Date:           Wed Oct 19 22:38:50 2016
  * Model version:  1.0
  * Matlab version: 8.9 (R2015b) 13-Aug-2015
  ****************************************************************************/
@@ -354,7 +354,7 @@ int
   if (final_time >= 0.0 || final_time == RUN_FOREVER) {
     rtmSetTFinal(S,final_time);
   } else {
-    rtmSetTFinal(S,7.0);
+    rtmSetTFinal(S,40.0);
   }
 
   action.sa_handler = control_c_handler;
@@ -407,7 +407,7 @@ int
                       scheduling_priority, rtmGetStepSize(S));
       fflush(stdout);
       result = hil_task_start(untitled_DW.HILReadAnalogTimebase1_Task, (t_clock)
-        untitled_P.HILReadAnalogTimebase1_clock, 500.0, -1)
+        untitled_P.HILReadAnalogTimebase1_clock, 1000.0, -1)
         ;
       if (result == 0) {
         /* Enter the periodic loop */

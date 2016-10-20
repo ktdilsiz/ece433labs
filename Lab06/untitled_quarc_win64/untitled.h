@@ -9,7 +9,7 @@
  *
  * Model version              : 1.0
  * Simulink Coder version : 8.9 (R2015b) 13-Aug-2015
- * C source code generated on : Wed Oct 19 18:52:32 2016
+ * C source code generated on : Wed Oct 19 22:38:51 2016
  *
  * Target selection: quarc_win64.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -20,6 +20,8 @@
 
 #ifndef RTW_HEADER_untitled_h_
 #define RTW_HEADER_untitled_h_
+#include <float.h>
+#include <math.h>
 #include <string.h>
 #ifndef untitled_COMMON_INCLUDES_
 # define untitled_COMMON_INCLUDES_
@@ -814,15 +816,14 @@
 
 /* Block signals (auto storage) */
 typedef struct {
-  real_T Tacometer1;                   /* '<Root>/Tacometer1' */
+  real_T Encoder1;                     /* '<Root>/Encoder1' */
   real_T Add4;                         /* '<Root>/Add4' */
-  real_T Gain6;                        /* '<Root>/Gain6' */
   real_T Gain3;                        /* '<Root>/Gain3' */
   real_T TransferFcn;                  /* '<Root>/Transfer Fcn' */
-  real_T Potentiometer1;               /* '<Root>/Potentiometer1' */
-  real_T Encoder1;                     /* '<Root>/Encoder1' */
   real_T Add2;                         /* '<Root>/Add2' */
   real_T Saturation2;                  /* '<Root>/Saturation2' */
+  real_T Potentiometer1;               /* '<Root>/Potentiometer1' */
+  real_T Tacometer1;                   /* '<Root>/Tacometer1' */
 } B_untitled_T;
 
 /* Block states (auto storage) for system '<Root>' */
@@ -836,17 +837,25 @@ typedef struct {
   real_T HILInitialize_POSortedFreqs[8];/* '<Root>/HIL Initialize' */
   real_T HILInitialize_POValues[8];    /* '<Root>/HIL Initialize' */
   real_T HILReadAnalogTimebase1_Buffer[2];/* '<Root>/HIL Read Analog Timebase1' */
-  real_T TimeStampA;                   /* '<Root>/Derivative' */
-  real_T LastUAtTimeA;                 /* '<Root>/Derivative' */
-  real_T TimeStampB;                   /* '<Root>/Derivative' */
-  real_T LastUAtTimeB;                 /* '<Root>/Derivative' */
+  real_T TimeStampA;                   /* '<Root>/Derivative1' */
+  real_T LastUAtTimeA;                 /* '<Root>/Derivative1' */
+  real_T TimeStampB;                   /* '<Root>/Derivative1' */
+  real_T LastUAtTimeB;                 /* '<Root>/Derivative1' */
+  real_T TimeStampA_i;                 /* '<Root>/Derivative' */
+  real_T LastUAtTimeA_f;               /* '<Root>/Derivative' */
+  real_T TimeStampB_a;                 /* '<Root>/Derivative' */
+  real_T LastUAtTimeB_d;               /* '<Root>/Derivative' */
   t_task HILReadAnalogTimebase1_Task;  /* '<Root>/HIL Read Analog Timebase1' */
   t_card HILInitialize_Card;           /* '<Root>/HIL Initialize' */
-  void *HILWriteAnalog_PWORK;          /* '<Root>/HIL Write Analog' */
   void *HILReadEncoder1_PWORK;         /* '<Root>/HIL Read Encoder1' */
+  void *HILWriteAnalog_PWORK;          /* '<Root>/HIL Write Analog' */
   struct {
-    void *LoggedData[3];
+    void *LoggedData[2];
   } Thetalab1_PWORK;                   /* '<Root>/Theta lab1' */
+
+  struct {
+    void *LoggedData[2];
+  } Thetalab2_PWORK;                   /* '<Root>/Theta lab2' */
 
   int32_T HILInitialize_ClockModes[3]; /* '<Root>/HIL Initialize' */
   int32_T HILInitialize_QuadratureModes[8];/* '<Root>/HIL Initialize' */
@@ -924,9 +933,6 @@ struct P_untitled_T_ {
                                         *   '<Root>/Gain1'
                                         *   '<Root>/Gain5'
                                         */
-  real_T Ramp_X0;                      /* Mask Parameter: Ramp_X0
-                                        * Referenced by: '<S1>/Constant1'
-                                        */
   real_T HILInitialize_analog_input_maxi;/* Mask Parameter: HILInitialize_analog_input_maxi
                                           * Referenced by: '<Root>/HIL Initialize'
                                           */
@@ -960,26 +966,21 @@ struct P_untitled_T_ {
   real_T HILInitialize_pwm_trailing_dead;/* Mask Parameter: HILInitialize_pwm_trailing_dead
                                           * Referenced by: '<Root>/HIL Initialize'
                                           */
+  real_T RepeatingSequence_rep_seq_y[5];/* Mask Parameter: RepeatingSequence_rep_seq_y
+                                         * Referenced by: '<S2>/Look-Up Table1'
+                                         */
   real_T HILInitialize_set_other_outputs;/* Mask Parameter: HILInitialize_set_other_outputs
-                                          * Referenced by: '<Root>/HIL Initialize'
-                                          */
-  real_T HILInitialize_set_other_outpu_b;/* Mask Parameter: HILInitialize_set_other_outpu_b
                                           * Referenced by: '<Root>/HIL Initialize'
                                           */
   real_T HILInitialize_set_other_outpu_e;/* Mask Parameter: HILInitialize_set_other_outpu_e
                                           * Referenced by: '<Root>/HIL Initialize'
                                           */
-  real_T HILInitialize_set_other_outpu_p;/* Mask Parameter: HILInitialize_set_other_outpu_p
+  real_T HILInitialize_set_other_outpu_g;/* Mask Parameter: HILInitialize_set_other_outpu_g
                                           * Referenced by: '<Root>/HIL Initialize'
                                           */
-  real_T Ramp_slope;                   /* Mask Parameter: Ramp_slope
-                                        * Referenced by: '<S1>/Step'
-                                        */
-  real_T Ramp_start;                   /* Mask Parameter: Ramp_start
-                                        * Referenced by:
-                                        *   '<S1>/Constant'
-                                        *   '<S1>/Step'
-                                        */
+  real_T HILInitialize_set_other_outpu_o;/* Mask Parameter: HILInitialize_set_other_outpu_o
+                                          * Referenced by: '<Root>/HIL Initialize'
+                                          */
   real_T HILInitialize_watchdog_analog_o;/* Mask Parameter: HILInitialize_watchdog_analog_o
                                           * Referenced by: '<Root>/HIL Initialize'
                                           */
@@ -1019,11 +1020,11 @@ struct P_untitled_T_ {
   uint32_T HILReadAnalogTimebase1_channels[2];/* Mask Parameter: HILReadAnalogTimebase1_channels
                                                * Referenced by: '<Root>/HIL Read Analog Timebase1'
                                                */
-  uint32_T HILWriteAnalog_channels;    /* Mask Parameter: HILWriteAnalog_channels
-                                        * Referenced by: '<Root>/HIL Write Analog'
-                                        */
   uint32_T HILReadEncoder1_channels;   /* Mask Parameter: HILReadEncoder1_channels
                                         * Referenced by: '<Root>/HIL Read Encoder1'
+                                        */
+  uint32_T HILWriteAnalog_channels;    /* Mask Parameter: HILWriteAnalog_channels
+                                        * Referenced by: '<Root>/HIL Write Analog'
                                         */
   uint32_T HILInitialize_encoder_channels[8];/* Mask Parameter: HILInitialize_encoder_channels
                                               * Referenced by: '<Root>/HIL Initialize'
@@ -1049,88 +1050,88 @@ struct P_untitled_T_ {
   boolean_T HILInitialize_set_analog_input_;/* Mask Parameter: HILInitialize_set_analog_input_
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
-  boolean_T HILInitialize_set_analog_inpu_b;/* Mask Parameter: HILInitialize_set_analog_inpu_b
+  boolean_T HILInitialize_set_analog_inpu_c;/* Mask Parameter: HILInitialize_set_analog_inpu_c
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
   boolean_T HILInitialize_set_analog_output;/* Mask Parameter: HILInitialize_set_analog_output
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
-  boolean_T HILInitialize_set_analog_outp_f;/* Mask Parameter: HILInitialize_set_analog_outp_f
+  boolean_T HILInitialize_set_analog_outp_i;/* Mask Parameter: HILInitialize_set_analog_outp_i
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
   boolean_T HILInitialize_set_analog_outp_g;/* Mask Parameter: HILInitialize_set_analog_outp_g
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
-  boolean_T HILInitialize_set_analog_outp_h;/* Mask Parameter: HILInitialize_set_analog_outp_h
-                                             * Referenced by: '<Root>/HIL Initialize'
-                                             */
-  boolean_T HILInitialize_set_analog_outp_b;/* Mask Parameter: HILInitialize_set_analog_outp_b
+  boolean_T HILInitialize_set_analog_outp_o;/* Mask Parameter: HILInitialize_set_analog_outp_o
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
   boolean_T HILInitialize_set_analog_outp_a;/* Mask Parameter: HILInitialize_set_analog_outp_a
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
-  boolean_T HILInitialize_set_analog_outp_p;/* Mask Parameter: HILInitialize_set_analog_outp_p
+  boolean_T HILInitialize_set_analog_outp_l;/* Mask Parameter: HILInitialize_set_analog_outp_l
+                                             * Referenced by: '<Root>/HIL Initialize'
+                                             */
+  boolean_T HILInitialize_set_analog_outp_d;/* Mask Parameter: HILInitialize_set_analog_outp_d
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
   boolean_T HILInitialize_set_clock_frequen;/* Mask Parameter: HILInitialize_set_clock_frequen
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
-  boolean_T HILInitialize_set_clock_frequ_h;/* Mask Parameter: HILInitialize_set_clock_frequ_h
+  boolean_T HILInitialize_set_clock_frequ_g;/* Mask Parameter: HILInitialize_set_clock_frequ_g
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
   boolean_T HILInitialize_set_clock_params_;/* Mask Parameter: HILInitialize_set_clock_params_
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
-  boolean_T HILInitialize_set_clock_param_b;/* Mask Parameter: HILInitialize_set_clock_param_b
+  boolean_T HILInitialize_set_clock_param_d;/* Mask Parameter: HILInitialize_set_clock_param_d
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
   boolean_T HILInitialize_set_digital_outpu;/* Mask Parameter: HILInitialize_set_digital_outpu
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
-  boolean_T HILInitialize_set_digital_out_o;/* Mask Parameter: HILInitialize_set_digital_out_o
-                                             * Referenced by: '<Root>/HIL Initialize'
-                                             */
-  boolean_T HILInitialize_set_digital_out_a;/* Mask Parameter: HILInitialize_set_digital_out_a
-                                             * Referenced by: '<Root>/HIL Initialize'
-                                             */
-  boolean_T HILInitialize_set_digital_out_e;/* Mask Parameter: HILInitialize_set_digital_out_e
-                                             * Referenced by: '<Root>/HIL Initialize'
-                                             */
-  boolean_T HILInitialize_set_digital_out_b;/* Mask Parameter: HILInitialize_set_digital_out_b
-                                             * Referenced by: '<Root>/HIL Initialize'
-                                             */
-  boolean_T HILInitialize_set_digital_ou_e5;/* Mask Parameter: HILInitialize_set_digital_ou_e5
+  boolean_T HILInitialize_set_digital_out_l;/* Mask Parameter: HILInitialize_set_digital_out_l
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
   boolean_T HILInitialize_set_digital_out_f;/* Mask Parameter: HILInitialize_set_digital_out_f
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
+  boolean_T HILInitialize_set_digital_out_b;/* Mask Parameter: HILInitialize_set_digital_out_b
+                                             * Referenced by: '<Root>/HIL Initialize'
+                                             */
+  boolean_T HILInitialize_set_digital_out_o;/* Mask Parameter: HILInitialize_set_digital_out_o
+                                             * Referenced by: '<Root>/HIL Initialize'
+                                             */
+  boolean_T HILInitialize_set_digital_ou_lb;/* Mask Parameter: HILInitialize_set_digital_ou_lb
+                                             * Referenced by: '<Root>/HIL Initialize'
+                                             */
+  boolean_T HILInitialize_set_digital_ou_lf;/* Mask Parameter: HILInitialize_set_digital_ou_lf
+                                             * Referenced by: '<Root>/HIL Initialize'
+                                             */
   boolean_T HILInitialize_set_encoder_count;/* Mask Parameter: HILInitialize_set_encoder_count
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
-  boolean_T HILInitialize_set_encoder_cou_l;/* Mask Parameter: HILInitialize_set_encoder_cou_l
+  boolean_T HILInitialize_set_encoder_cou_d;/* Mask Parameter: HILInitialize_set_encoder_cou_d
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
   boolean_T HILInitialize_set_encoder_param;/* Mask Parameter: HILInitialize_set_encoder_param
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
-  boolean_T HILInitialize_set_encoder_par_j;/* Mask Parameter: HILInitialize_set_encoder_par_j
+  boolean_T HILInitialize_set_encoder_par_c;/* Mask Parameter: HILInitialize_set_encoder_par_c
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
-  boolean_T HILInitialize_set_other_outp_bx;/* Mask Parameter: HILInitialize_set_other_outp_bx
+  boolean_T HILInitialize_set_other_outpu_j;/* Mask Parameter: HILInitialize_set_other_outpu_j
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
   boolean_T HILInitialize_set_pwm_outputs_a;/* Mask Parameter: HILInitialize_set_pwm_outputs_a
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
-  boolean_T HILInitialize_set_pwm_outputs_l;/* Mask Parameter: HILInitialize_set_pwm_outputs_l
+  boolean_T HILInitialize_set_pwm_outputs_h;/* Mask Parameter: HILInitialize_set_pwm_outputs_h
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
-  boolean_T HILInitialize_set_pwm_output_ab;/* Mask Parameter: HILInitialize_set_pwm_output_ab
+  boolean_T HILInitialize_set_pwm_outputs_m;/* Mask Parameter: HILInitialize_set_pwm_outputs_m
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
-  boolean_T HILInitialize_set_pwm_outputs_p;/* Mask Parameter: HILInitialize_set_pwm_outputs_p
+  boolean_T HILInitialize_set_pwm_outputs_c;/* Mask Parameter: HILInitialize_set_pwm_outputs_c
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
   boolean_T HILInitialize_set_pwm_outputs_o;/* Mask Parameter: HILInitialize_set_pwm_outputs_o
@@ -1139,14 +1140,23 @@ struct P_untitled_T_ {
   boolean_T HILInitialize_set_pwm_params_at;/* Mask Parameter: HILInitialize_set_pwm_params_at
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
-  boolean_T HILInitialize_set_pwm_params__f;/* Mask Parameter: HILInitialize_set_pwm_params__f
+  boolean_T HILInitialize_set_pwm_params__c;/* Mask Parameter: HILInitialize_set_pwm_params__c
                                              * Referenced by: '<Root>/HIL Initialize'
                                              */
   real_T Motor1_IC;                    /* Expression: 0
                                         * Referenced by: '<Root>/Motor1'
                                         */
-  real_T Step_Y0;                      /* Expression: 0
-                                        * Referenced by: '<S1>/Step'
+  real_T Constant_Value;               /* Expression: period
+                                        * Referenced by: '<S2>/Constant'
+                                        */
+  real_T LookUpTable1_bp01Data[5];     /* Expression: rep_seq_t - min(rep_seq_t)
+                                        * Referenced by: '<S2>/Look-Up Table1'
+                                        */
+  real_T Gain8_Gain;                   /* Expression: 3
+                                        * Referenced by: '<Root>/Gain8'
+                                        */
+  real_T Encoder1_Gain;                /* Expression: 2*pi/(1024*4)
+                                        * Referenced by: '<Root>/Encoder1'
                                         */
   real_T Saturation1_UpperSat;         /* Expression: 10
                                         * Referenced by: '<Root>/Saturation1'
@@ -1163,12 +1173,6 @@ struct P_untitled_T_ {
   real_T TransferFcn_C[2];             /* Computed Parameter: TransferFcn_C
                                         * Referenced by: '<Root>/Transfer Fcn'
                                         */
-  real_T Potentiometer1_Gain;          /* Expression: (-352*pi/180)/10
-                                        * Referenced by: '<Root>/Potentiometer1'
-                                        */
-  real_T Encoder1_Gain;                /* Expression: 2*pi/(1024*4)
-                                        * Referenced by: '<Root>/Encoder1'
-                                        */
   real_T Motor_IC;                     /* Expression: 0
                                         * Referenced by: '<Root>/Motor'
                                         */
@@ -1178,14 +1182,17 @@ struct P_untitled_T_ {
   real_T Saturation2_LowerSat;         /* Expression: -10
                                         * Referenced by: '<Root>/Saturation2'
                                         */
+  real_T Potentiometer1_Gain;          /* Expression: (-352*pi/180)/10
+                                        * Referenced by: '<Root>/Potentiometer1'
+                                        */
   boolean_T HILReadAnalogTimebase1_Active;/* Computed Parameter: HILReadAnalogTimebase1_Active
                                            * Referenced by: '<Root>/HIL Read Analog Timebase1'
                                            */
-  boolean_T HILWriteAnalog_Active;     /* Computed Parameter: HILWriteAnalog_Active
-                                        * Referenced by: '<Root>/HIL Write Analog'
-                                        */
   boolean_T HILReadEncoder1_Active;    /* Computed Parameter: HILReadEncoder1_Active
                                         * Referenced by: '<Root>/HIL Read Encoder1'
+                                        */
+  boolean_T HILWriteAnalog_Active;     /* Computed Parameter: HILWriteAnalog_Active
+                                        * Referenced by: '<Root>/HIL Write Analog'
                                         */
 };
 
@@ -1349,5 +1356,6 @@ extern RT_MODEL_untitled_T *const untitled_M;
  *
  * '<Root>' : 'untitled'
  * '<S1>'   : 'untitled/Ramp'
+ * '<S2>'   : 'untitled/Repeating Sequence'
  */
 #endif                                 /* RTW_HEADER_untitled_h_ */

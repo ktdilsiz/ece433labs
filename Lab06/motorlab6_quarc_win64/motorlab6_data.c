@@ -9,7 +9,7 @@
  *
  * Model version              : 1.3
  * Simulink Coder version : 8.9 (R2015b) 13-Aug-2015
- * C source code generated on : Wed Oct 19 17:25:29 2016
+ * C source code generated on : Wed Oct 19 21:28:19 2016
  *
  * Target selection: quarc_win64.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -26,7 +26,7 @@ P_motorlab6_T motorlab6_P = {
   70.0,                                /* Variable: Kg
                                         * Referenced by: '<Root>/Tacometer'
                                         */
-  -0.47465728006963709,                /* Variable: Kp
+  0.659476150869856,                   /* Variable: Kp
                                         * Referenced by:
                                         *   '<Root>/Gain2'
                                         *   '<Root>/Gain8'
@@ -256,7 +256,7 @@ P_motorlab6_T motorlab6_P = {
   -0.0,                                /* Computed Parameter: TransferFcn4_A
                                         * Referenced by: '<Root>/Transfer Fcn4'
                                         */
-  0.65881733353631977,                 /* Computed Parameter: TransferFcn4_C
+  0.0037704416879137891,               /* Computed Parameter: TransferFcn4_C
                                         * Referenced by: '<Root>/Transfer Fcn4'
                                         */
   10.0,                                /* Expression: 10
@@ -311,16 +311,16 @@ P_motorlab6_T motorlab6_P = {
   -0.0,                                /* Computed Parameter: TransferFcn2_A
                                         * Referenced by: '<Root>/Transfer Fcn2'
                                         */
-  0.65881733353631977,                 /* Computed Parameter: TransferFcn2_C
+  0.0037704416879137891,               /* Computed Parameter: TransferFcn2_C
                                         * Referenced by: '<Root>/Transfer Fcn2'
                                         */
   -0.0,                                /* Computed Parameter: TransferFcn_A
                                         * Referenced by: '<Root>/Transfer Fcn'
                                         */
-  0.65881733353631977,                 /* Computed Parameter: TransferFcn_C
+  0.0037704416879137891,               /* Computed Parameter: TransferFcn_C
                                         * Referenced by: '<Root>/Transfer Fcn'
                                         */
-  -0.47465728006963709,                /* Computed Parameter: TransferFcn_D
+  0.659476150869856,                   /* Computed Parameter: TransferFcn_D
                                         * Referenced by: '<Root>/Transfer Fcn'
                                         */
   10.0,                                /* Expression: 10
@@ -338,7 +338,7 @@ P_motorlab6_T motorlab6_P = {
   1U,                                  /* Computed Parameter: ManualSwitch1_CurrentSetting
                                         * Referenced by: '<Root>/Manual Switch1'
                                         */
-  1U,                                  /* Computed Parameter: ManualSwitch_CurrentSetting
+  0U,                                  /* Computed Parameter: ManualSwitch_CurrentSetting
                                         * Referenced by: '<Root>/Manual Switch'
                                         */
   1,                                   /* Computed Parameter: HILReadAnalogTimebase_Active
