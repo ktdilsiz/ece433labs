@@ -105,6 +105,19 @@ k = 36;
 %[Eimin, I] = min(Ei)
 %plot(fc,Ei);
 
+%(-352*pi/180)/10 for potemtiometer
+%((-1000*2*pi/60)/1.5)/Kg for Tacometer
+%2*pi/(1024*4) for Encoder
+
+% potentiometer from HIL Read Analog Timebase 0 --> continous rise theta
+% encoder from HIL Read Encoder 0 --> sawtooth
+% tacometer rom HIL Read Analog Timebase 1 --> omega/speed
+
+% Signal Generator amplitude 1, Frequency 0.4
+% bias of 1.5 --> u + 1.5
+
+% HIL Write Analog
+
 
 
 
